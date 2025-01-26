@@ -3,5 +3,5 @@
 2. Pass for the left list and multiply each number for the count gather in the first step and added to the total value
 
 For(){
-tot += izquierda * derecha[izquierda]
+tot += left * right[left]
 }
