@@ -34,6 +34,23 @@ fun isDiagonalDownLeftWord(y: Int, x: Int, lines: List<String>): Boolean {
     return lines[y+1][x-1] == 'M' && lines[y+2][x-2] == 'A' && lines[y+3][x-3] == 'S'
 }
 
+fun isXvalid(y: Int, x: Int, lines: List<String>): Boolean {
+    if(lines[y-1][x-1] == 'M' && lines[y+1][x+1] == 'S'){
+        if(lines[y+1][x-1] == 'M' && lines[y-1][x+1] == 'S'){
+            return true
+        }else if(lines[y+1][x-1] == 'S' && lines[y-1][x+1] == 'M'){
+            return true
+        }
+    }else if(lines[y-1][x-1] == 'S' && lines[y+1][x+1] == 'M'){
+        if(lines[y+1][x-1] == 'M' && lines[y-1][x+1] == 'S'){
+            return true
+        }else if(lines[y+1][x-1] == 'S' && lines[y-1][x+1] == 'M'){
+            return true
+        }
+    }
+    return false
+}
+
 fun firstPart(lines: List<String>){
     println(lines)
     val elementsY = lines.size
@@ -93,7 +110,23 @@ fun firstPart(lines: List<String>){
 }
 
 fun secondPart(lines: List<String>){
-
+    println(lines)
+    val elementsY = lines.size
+    var cnt = 0
+    lines.forEachIndexed {// [MMMSXXMASM, MSAMXMSMSA, AMXSXMAAMM, MSAMASMSMX, XMASAMXAMM, XXAMMXXAMA, SMSMSASXSS, SAXAMASAAA, MAMMMXMMMM, MXMXAXMASX]
+            y, line ->
+        line.forEachIndexed { x, c ->// format: MMMSXXMASM
+            val elementsX = line.length
+            if (c == 'A') {
+                if(x + 1 < elementsX && y+1 < elementsY && x -1 >= 0 && y-1 >= 0){
+                    if(isXvalid(y,x,lines)){
+                        cnt++
+                    }
+                }
+            }
+        }
+    }
+    println(cnt)
 }
 
 fun main() {
