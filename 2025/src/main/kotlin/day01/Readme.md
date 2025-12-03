@@ -7,3 +7,5 @@
 1. When the value is more than 100
 ## Solution
 1. Do the module of 100 for the value of the rotation
+## Learnings
+1. Try to do functions so it's easier to debug
