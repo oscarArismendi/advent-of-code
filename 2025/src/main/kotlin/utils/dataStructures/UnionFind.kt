@@ -54,14 +54,14 @@ class UnionFind(val size: Int) {
             if(parent == first.second || parent == second.second || parent == third.second)continue
             if(groupSize[parent] > first.first){
                 // we move everything down to make space for the new max
-                third = third.copy(second.first,second.second)
-                second = second.copy(first.first,first.second)
-                first = first.copy(groupSize[parent],parent)                
+                third = second
+                second = first
+                first = groupSize[parent] to parent                
             }else if(groupSize[parent] > second.first){
-                third = third.copy(second.first,second.second)
-                second = second.copy(groupSize[parent],parent)
+                third = second
+                second = groupSize[parent] to parent
             }else if(groupSize[parent] > third.first){
-                third = third.copy(groupSize[parent],parent)
+                third = groupSize[parent] to parent
             }
         }
         return first.first * second.first * third.first
