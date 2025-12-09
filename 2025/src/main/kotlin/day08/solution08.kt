@@ -50,7 +50,7 @@ fun firstPart(coordinates: MutableList<String>, threshold: Int): Int{
 
     // Connect points in order of increasing distance
     for(instruction in instructionList){
-        val (node1, node2) = instruction.second.split("-").map { it.toInt() }
+        val (node1, node2) = instruction.second
         unionFind.union(node1, node2)  // Connect the two points
         connections++
         if(connections == threshold) break  // Stop after reaching the threshold
@@ -79,7 +79,7 @@ fun secondPart(coordinates: MutableList<String>): Long{
 
     // Connect points in order of increasing distance
     for(instruction in instructionList){
-        val (node1, node2) = instruction.second.split("-").map { it.toInt() }
+        val (node1, node2) = instruction.second
         unionFind.union(node1, node2)  // Connect the two points
         connections++
 
@@ -107,10 +107,10 @@ fun secondPart(coordinates: MutableList<String>): Long{
  * 3. Returns a list of pairs sorted by increasing distance
  * 
  * @param coordinates List of 3D coordinates in format "x,y,z"
- * @return List of pairs (distance, "index1-index2") sorted by distance
+ * @return List of pairs (distance, Pair(index1, index2)) sorted by distance
  */
-fun createInstructionList(coordinates:MutableList<String>): List<Pair<Double,String>>{
-    val instructionList = mutableListOf<Pair<Double,String>>()
+fun createInstructionList(coordinates:MutableList<String>): List<Pair<Double, Pair<Int, Int>>>{
+    val instructionList = mutableListOf<Pair<Double,Pair<Int, Int>>>()
     val coordinatesIterations = coordinates.size - 1
 
     // Generate all unique pairs of points (O(n²) operation)
@@ -119,7 +119,7 @@ fun createInstructionList(coordinates:MutableList<String>): List<Pair<Double,Str
             // Calculate distance between the two points
             val distance = calculateEuclideanDistance(coordinates[first],coordinates[second])
             // Store the distance and the indices of the points
-            instructionList.add(distance to "$first-${second}")
+            instructionList.add(distance to Pair(first,second))
         }
     }
 

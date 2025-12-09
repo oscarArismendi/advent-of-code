@@ -17,9 +17,9 @@ class Solution08Test {
             "906,360,560"            
         )
         val expectedInstructionList = listOf(
-            Pair(787.814064357828,"0-1"),
-            Pair(908.7843528582565,"0-2"),
-            Pair(1019.9872548223335,"1-2"),
+            Pair(787.814064357828,Pair(0,1)),
+            Pair(908.7843528582565,Pair(0,2)),
+            Pair(1019.9872548223335,Pair(1,2)),
         )
 
         assertEquals(expectedInstructionList, createInstructionList(coordinates))
