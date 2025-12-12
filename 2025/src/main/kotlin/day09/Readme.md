@@ -10,3 +10,4 @@
 
 ## Learnings
 1. Need to make a course of graphs
+2. To solve part two let's begin by learning ray-casting
