@@ -3,6 +3,7 @@ package day09
 import com.aoc.day09.calculateRectangleAreaBetweenTwoCoordinates
 import com.aoc.day09.createAListOfAreas
 import com.aoc.day09.firstPart
+import com.aoc.day09.secondPart
 import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.test.assertEquals
@@ -68,5 +69,14 @@ class Solution09Test {
 
         // Then we get the largest area
         assertEquals(50L, result)
+    }
+
+    @Test
+    fun `Part 2 returns the largest valid rectangle area`() {
+        // When we run part 2
+        val result = secondPart(inputEasyLines)
+
+        // Then we get the expected area
+        assertEquals(24L, result, "Part 2 should return 24L with inputEasy.txt")
     }
 }
