@@ -24,6 +24,8 @@ fun main(){
     println("ans: $ans")
 }
 
+private const val i = 0
+
 /**
  * Solves part 1 of the puzzle.
  * Parses light diagrams and button wirings from input, then finds the minimum
@@ -50,7 +52,70 @@ fun firstPart(lines: MutableList<String>): Int{
 /**
  * Placeholder for part 2 solution.
  */
-fun secondPart(lines: MutableList<String>){}
+fun secondPart(lines: MutableList<String>): Int{
+    val specifiedJoltageLevels = parseJoltageLevels(lines)
+    val joltageLevelSize = specifiedJoltageLevels[0].size
+    val buttonsWiring = parseButtonsWiring(lines, joltageLevelSize)
+    val amountOfMachines = lines.size
+
+    var total = 0
+    
+    for(i in 0 until amountOfMachines){
+        val initialJoltage = IntArray(specifiedJoltageLevels[i].size) { 0 }
+        val minimumPresses = findMinimumNumberOfPressesForJoltageWithBFS(
+            buttonsWiring[i],
+            specifiedJoltageLevels[i],
+            initialJoltage,
+        )
+        total += minimumPresses
+    }
+    return total
+}
+
+fun findMinimumNumberOfPressesForJoltageWithBFS(
+    buttons: MutableList<BitSet>,
+    specifiedJoltage: IntArray,
+    currentJoltage: IntArray,
+): Int {
+    val visitedJoltages = mutableSetOf<Int>()
+    var numberOfPresses = 0
+    val stack = ArrayDeque(listOf(currentJoltage to numberOfPresses)) 
+    while (stack.isNotEmpty()) {
+        val (currentJoltage, presses) = stack.removeFirst()
+        numberOfPresses = presses // we want to be able to get the presses outside the loop
+        if (currentJoltage.contentHashCode() in visitedJoltages) continue
+        if( currentJoltage.contentEquals(specifiedJoltage)) return  presses
+        visitedJoltages.add(currentJoltage.contentHashCode())
+        for(button in buttons) { 
+            var nextJoltage = currentJoltage.copyOf()
+            for(buttonPosition in 0 until button.size()){
+               if (button.get(buttonPosition)) {
+                   nextJoltage[buttonPosition]++
+                   if(nextJoltage[buttonPosition] > specifiedJoltage[buttonPosition] ) {
+                       nextJoltage = IntArray(0)
+                       break
+                   }
+               }
+            }
+            if(nextJoltage.isNotEmpty()) stack.add(nextJoltage to presses + 1) // we add one to the presses
+        }
+    }    
+    return numberOfPresses 
+}
+
+fun parseJoltageLevels(lines: MutableList<String>): MutableList<IntArray>{
+    val joltageLevels = mutableListOf<IntArray>()
+    val amountOfLines = lines.size
+    for(row in 0 until amountOfLines){
+        val positionOfClosingJoltageLevels = lines[row].length - 1
+        val positionOfStartingJoltageLevels = lines[row].indexOf("{") + 1
+        val stringOfJoltageLevels = lines[row].substring(positionOfStartingJoltageLevels, positionOfClosingJoltageLevels) // Extract content between { and }
+        val currentJoltageLevels = stringOfJoltageLevels.split(",").map { it.trim().toInt() }.toMutableList()
+        joltageLevels.add(currentJoltageLevels.toIntArray())
+    }
+    return joltageLevels
+}
+
 
 /**
  * Parses light diagrams from input lines.
