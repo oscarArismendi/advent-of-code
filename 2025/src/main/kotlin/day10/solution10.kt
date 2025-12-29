@@ -2,6 +2,8 @@ package com.aoc.day10
 
 import java.io.File
 import java.util.BitSet
+import java.util.PriorityQueue
+import kotlin.math.min
 
 /**
  * Main entry point for the Day 10 solution.
@@ -53,7 +55,7 @@ fun firstPart(lines: MutableList<String>): Int{
  * Placeholder for part 2 solution.
  */
 fun secondPart(lines: MutableList<String>): Int{
-    val specifiedJoltageLevels = parseJoltageLevels(lines)
+    val specifiedJoltageLevels = parseJoltageLevels(lines).map{it.toMutableList()}
     val joltageLevelSize = specifiedJoltageLevels[0].size
     val buttonsWiring = parseButtonsWiring(lines, joltageLevelSize)
     val amountOfMachines = lines.size
@@ -61,8 +63,8 @@ fun secondPart(lines: MutableList<String>): Int{
     var total = 0
     
     for(i in 0 until amountOfMachines){
-        val initialJoltage = IntArray(specifiedJoltageLevels[i].size) { 0 }
-        val minimumPresses = findMinimumNumberOfPressesForJoltageWithBFS(
+        val initialJoltage = List(specifiedJoltageLevels[i].size) { 0 }
+        val minimumPresses = findMinimumNumberOfPressesForJoltageWithAStar(
             buttonsWiring[i],
             specifiedJoltageLevels[i],
             initialJoltage,
@@ -101,6 +103,66 @@ fun findMinimumNumberOfPressesForJoltageWithBFS(
         }
     }    
     return numberOfPresses 
+}
+
+fun findMinimumNumberOfPressesForJoltageWithAStar(
+    buttons: MutableList<BitSet>,
+    specifiedJoltage: List<Int>,
+    currentJoltage: List<Int>,
+): Int {
+    val bestCost = mutableMapOf<List<Int>,Int>()
+    val stack = PriorityQueue<Triple<List<Int>,Int,Int>>(compareBy { 
+        it.second + it.third 
+    })
+    stack.add(Triple(
+        currentJoltage, 
+        0, // at the beginning we haven't pressed a button
+        heuristic(specifiedJoltage,currentJoltage))
+    )  
+    
+    while (stack.isNotEmpty()) {
+        val (currentJoltage, presses, futureCost) = stack.poll()
+        val best = bestCost[currentJoltage]
+        if (best != null && presses > best) continue // is not worth exploring an inefficient path
+        if(currentJoltage == specifiedJoltage ) {
+            return presses
+        }
+        
+        for(button in buttons) {
+            var nextJoltage = currentJoltage.toMutableList()
+            for(buttonPosition in 0 until button.size()){
+                if (button.get(buttonPosition)) {
+                    nextJoltage[buttonPosition]++
+                    if(nextJoltage[buttonPosition] > specifiedJoltage[buttonPosition] ) {
+                        nextJoltage = mutableListOf()
+                        break
+                    }
+                }
+            }
+            val nextState = nextJoltage.toList()
+            val nextMinimumNumberOfPresses = min((bestCost[nextState] ?: Int.MAX_VALUE) , presses + 1)
+            if(presses + 1 > nextMinimumNumberOfPresses) continue // we don't want to explore an inefficient path
+            bestCost[nextState] = nextMinimumNumberOfPresses
+            if(nextState.isNotEmpty()) stack.add(Triple(
+                nextJoltage,
+                nextMinimumNumberOfPresses,
+                heuristic(specifiedJoltage,nextState)
+            )) // we add one to the presses
+        }
+    }    
+    return -1 // we didn't arrive at a correct answer 
+}
+
+fun heuristic(
+    specifiedJoltage: List<Int>,
+    currentJoltage: List<Int>
+): Int{
+    var maxDifference = 0
+    for(i in currentJoltage.indices){
+        val currentDifference = specifiedJoltage[i] - currentJoltage[i]
+        if(currentDifference > maxDifference) maxDifference = currentDifference       
+    }
+    return maxDifference
 }
 
 fun parseJoltageLevels(lines: MutableList<String>): MutableList<IntArray>{

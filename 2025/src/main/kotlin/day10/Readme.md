@@ -91,3 +91,8 @@ is far beyond what BFS can handle.
 | ≥ 1B             | Impossible    |
 
 7. Let's try A* :,(
+8. A* Didn't work, my heuristic cost was to weak as many states have the same, like for example at the beginning almost all would have the maximum value of
+the goal or that value minus 1
+9. A* is good when the order matter, not like this case
+10. hashCode in intArrays is to dangerous to use as a key for a map, please don't use it like I did in BFS
+11. We'll try to learn from a [reddit approach](https://www.reddit.com/r/adventofcode/comments/1pk87hl/2025_day_10_part_2_bifurcate_your_way_to_victory/)

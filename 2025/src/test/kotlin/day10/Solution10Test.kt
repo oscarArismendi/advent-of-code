@@ -2,6 +2,7 @@ package day10
 
 import com.aoc.day10.findMinimumNumberOfPresses
 import com.aoc.day10.firstPart
+import com.aoc.day10.heuristic
 import com.aoc.day10.parseButtonsWiring
 import com.aoc.day10.parseJoltageLevels
 import com.aoc.day10.parseLightDiagram
@@ -15,8 +16,8 @@ import kotlin.test.assertContentEquals
 class Solution10Test {
     // Read the input files
     private val inputEasyFile = File("src/main/kotlin/day10/inputEasy.txt")
-    private val inputEasyLines = inputEasyFile.readLines().toMutableList()
 
+    private val inputEasyLines = inputEasyFile.readLines().toMutableList()
     private val oneLineInput = mutableListOf(
         inputEasyLines[0] // Just use the first line from inputEasy.txt
     )
@@ -256,5 +257,15 @@ class Solution10Test {
         // Total: 33 presses
         assertEquals(33, result)
     }
-    
+
+    @Test
+    fun `We get the max difference between all the joltages to know the minimum number of button presses needed to get to the goal`() {
+        // given
+        val currentJoltageLevels = listOf(3, 5, 4, 7)
+        val targetJoltageLevels = listOf(12,5,6,30)
+        // when
+        val result = heuristic(targetJoltageLevels,currentJoltageLevels)
+        // then
+        assertEquals(23,result)
+    }
 }
