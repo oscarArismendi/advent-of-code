@@ -56,6 +56,7 @@ fun firstPart(lines: MutableList<String>): Int{
  */
 fun secondPart(lines: MutableList<String>): Int{
     val specifiedJoltageLevels = parseJoltageLevels(lines).map{it.toMutableList()}
+    val joltagesToLightDiagrams = specifiedJoltageLevels.map{it.toLightDiagram()}
     val joltageLevelSize = specifiedJoltageLevels[0].size
     val buttonsWiring = parseButtonsWiring(lines, joltageLevelSize)
     val amountOfMachines = lines.size
@@ -72,6 +73,57 @@ fun secondPart(lines: MutableList<String>): Int{
         total += minimumPresses
     }
     return total
+}
+
+fun MutableList<Int>.toLightDiagram(): BitSet {
+    val bits = BitSet(this.size)
+    for (i in this.indices) {
+        if (this[i] % 2 != 0) {
+            bits.set(i) // odd → light ON
+        }
+    }
+    return bits
+}
+
+fun getValidButtonsCombinations(
+    buttons: List<BitSet>,
+    target: BitSet,
+    size: Int
+): MutableSet<List<BitSet>> {
+    val results = mutableSetOf<List<BitSet>>()
+    fun backtrack(
+        idx: Int,
+        current: BitSet,
+        chosen: MutableList<BitSet>
+    ) {
+        // If we've considered all buttons
+        if (idx == buttons.size) {
+            if (current == target) {
+                results.add(chosen.toList())
+            }
+            return
+        }
+
+        // OPTION 1: skip this button
+        backtrack(idx + 1, current, chosen)
+
+        // OPTION 2: take this button
+        val next = current.clone() as BitSet
+        next.xor(buttons[idx])
+        chosen.add(buttons[idx])
+
+        backtrack(idx + 1, next, chosen)
+
+        chosen.removeAt(chosen.lastIndex) // backtrack
+    }
+
+    backtrack(
+        idx = 0,
+        current = BitSet(size),
+        chosen = mutableListOf()
+    )
+
+    return results
 }
 
 fun findMinimumNumberOfPressesForJoltageWithBFS(
