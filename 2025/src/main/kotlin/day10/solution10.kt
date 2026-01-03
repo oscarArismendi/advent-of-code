@@ -56,26 +56,27 @@ fun firstPart(lines: MutableList<String>): Int{
  */
 fun secondPart(lines: MutableList<String>): Int{
     val specifiedJoltageLevels = parseJoltageLevels(lines).map{it.toMutableList()}
-    val joltagesToLightDiagrams = specifiedJoltageLevels.map{it.toLightDiagram()}
     val joltageLevelSize = specifiedJoltageLevels[0].size
     val buttonsWiring = parseButtonsWiring(lines, joltageLevelSize)
     val amountOfMachines = lines.size
 
     var total = 0
-    
+
     for(i in 0 until amountOfMachines){
-        val initialJoltage = List(specifiedJoltageLevels[i].size) { 0 }
-        val minimumPresses = findMinimumNumberOfPressesForJoltageWithAStar(
+        val minimumPresses = findMinimumNumberOfPressesByBifurcating(
             buttonsWiring[i],
             specifiedJoltageLevels[i],
-            initialJoltage,
+            mutableMapOf(),
         )
-        total += minimumPresses
+        if(minimumPresses != null){
+            total += minimumPresses
+        }
+        println("Machine ${i+1}: $minimumPresses presses - specifiedJoltageLevels: ${specifiedJoltageLevels[i]}")
     }
     return total
 }
 
-fun MutableList<Int>.toLightDiagram(): BitSet {
+fun List<Int>.toLightDiagram(): BitSet {
     val bits = BitSet(this.size)
     for (i in this.indices) {
         if (this[i] % 2 != 0) {
@@ -171,7 +172,7 @@ fun findMinimumNumberOfPressesForJoltageWithAStar(
         0, // at the beginning we haven't pressed a button
         heuristic(specifiedJoltage,currentJoltage))
     )  
-    
+
     while (stack.isNotEmpty()) {
         val (currentJoltage, presses, futureCost) = stack.poll()
         val best = bestCost[currentJoltage]
@@ -179,18 +180,10 @@ fun findMinimumNumberOfPressesForJoltageWithAStar(
         if(currentJoltage == specifiedJoltage ) {
             return presses
         }
-        
+
         for(button in buttons) {
-            var nextJoltage = currentJoltage.toMutableList()
-            for(buttonPosition in 0 until button.size()){
-                if (button.get(buttonPosition)) {
-                    nextJoltage[buttonPosition]++
-                    if(nextJoltage[buttonPosition] > specifiedJoltage[buttonPosition] ) {
-                        nextJoltage = mutableListOf()
-                        break
-                    }
-                }
-            }
+
+            val nextJoltage = addButtonToJoltage(button, currentJoltage, specifiedJoltage)
             val nextState = nextJoltage.toList()
             val nextMinimumNumberOfPresses = min((bestCost[nextState] ?: Int.MAX_VALUE) , presses + 1)
             if(presses + 1 > nextMinimumNumberOfPresses) continue // we don't want to explore an inefficient path
@@ -203,6 +196,79 @@ fun findMinimumNumberOfPressesForJoltageWithAStar(
         }
     }    
     return -1 // we didn't arrive at a correct answer 
+}
+
+private fun addButtonToJoltage(
+    button: BitSet,
+    currentJoltage: List<Int>,
+    specifiedJoltage: List<Int>
+): MutableList<Int> {
+    var nextJoltage = currentJoltage.toMutableList()
+    for (buttonPosition in 0 until button.size()) {
+        if (button.get(buttonPosition)) {
+            nextJoltage[buttonPosition]++
+            if (nextJoltage[buttonPosition] > specifiedJoltage[buttonPosition]) {
+                nextJoltage = mutableListOf()
+                break
+            }
+        }
+    }
+    return nextJoltage
+}
+
+fun subtractButtonFromJoltage(
+    button: BitSet,
+    currentJoltage: List<Int>?,
+): List<Int>? {
+    if(currentJoltage == null) return null // don't make sense to operate null joltage levels
+    val nextJoltage = currentJoltage.toMutableList()
+    for (buttonPosition in 0 until nextJoltage.size) {
+        if (button.get(buttonPosition)) {
+            nextJoltage[buttonPosition]--
+            if (nextJoltage[buttonPosition] < 0) {
+                return null
+            }
+        }
+    }
+    return nextJoltage.toList()
+}
+
+fun findMinimumNumberOfPressesByBifurcating(
+    buttons: List<BitSet>,
+    currentJoltage: List<Int>,
+    cache: MutableMap<List<Int>, Int>,
+): Int? {
+    var best = Int.MAX_VALUE
+    val lowerBound = currentJoltage.max()
+    val numberOfZeros = currentJoltage.count { it == 0 }
+
+    val totalJoltageLevels = currentJoltage.size
+    if(numberOfZeros == totalJoltageLevels) return 0
+
+    if(cache[currentJoltage] != null) return cache.getOrDefault(currentJoltage, Int.MAX_VALUE)
+
+    val lightDiagram = currentJoltage.toLightDiagram()
+
+    val validButtonsCombinations = getValidButtonsCombinations(buttons, lightDiagram, totalJoltageLevels)
+
+    for(buttonList in validButtonsCombinations){
+        var resultHolder : List<Int>? = currentJoltage
+        for(button in buttonList){
+            resultHolder = subtractButtonFromJoltage(button, resultHolder)
+        }
+        if(resultHolder == null) continue // invalid subtraction
+        if(resultHolder.any{it % 2 != 0}) continue // we can't half it
+        val half = resultHolder.map { it / 2 }
+        val bifurcationResult = findMinimumNumberOfPressesByBifurcating(buttons, half, cache)
+        if(bifurcationResult != null){
+            val cost = buttonList.size + 2 * bifurcationResult
+            if (cost < lowerBound) continue // It's impossible to press buttons less times than the max joltage
+            best = min(best,cost)
+        }
+    }
+    // Int.MAX_VALUE should never been taken into account, it mean that we simply didn't find an answer
+    if(best !=Int.MAX_VALUE) cache[currentJoltage] = best
+    return if (best == Int.MAX_VALUE) null else best
 }
 
 fun heuristic(

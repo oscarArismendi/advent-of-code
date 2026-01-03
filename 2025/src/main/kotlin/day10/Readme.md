@@ -98,3 +98,6 @@ the goal or that value minus 1
 11. We'll try to learn from a [reddit approach](https://www.reddit.com/r/adventofcode/comments/1pk87hl/2025_day_10_part_2_bifurcate_your_way_to_victory/)
 12. The goal is to reduce the number of joltages by half and the number of possible 
 13. I need a stronger foundation on backtracking
+14. 19659 and 19697 are too low :.(
+15. 19810 was the right answer!!
+16. What is important in DP problems is to define laws that don't allow me to process impossible states
