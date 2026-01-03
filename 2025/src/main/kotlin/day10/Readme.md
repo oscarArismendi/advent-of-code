@@ -90,7 +90,9 @@ is far beyond what BFS can handle.
 | ≥ 100M           | No            |
 | ≥ 1B             | Impossible    |
 
-7. Let's try A* :,(
+7. Let's try A* :,( 
+   a. [video resource](https://www.youtube.com/watch?v=ySN5Wnu88nE)
+   b. [blog resource](https://www.redblobgames.com/pathfinding/a-star/introduction.html)
 8. A* Didn't work, my heuristic cost was to weak as many states have the same, like for example at the beginning almost all would have the maximum value of
 the goal or that value minus 1
 9. A* is good when the order matter, not like this case
