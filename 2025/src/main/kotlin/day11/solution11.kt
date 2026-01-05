@@ -23,8 +23,11 @@ fun main(){
     println("ans: $ans")
 }
 
-fun secondPart(lines: MutableList<String>) {
-    TODO("Not yet implemented")
+fun secondPart(lines: MutableList<String>): Long {
+    val adjacencyList = lines.toAdjacencyList()
+    val start = State("svr", false, false)
+    val totalNumberOfPathsFromYouToOut = countOutPathsThatContainDacAndFft(start,adjacencyList,mutableMapOf())
+    return totalNumberOfPathsFromYouToOut
 }
 
 fun firstPart(lines: MutableList<String>): Int {
@@ -52,6 +55,36 @@ fun countOutPaths(adjacencyList: Map<String, List<String>>): Int {
         }
     }
     return counter
+}
+
+
+data class State(val node: String, val seenDac: Boolean = false, val seenFft: Boolean = false)
+
+fun countOutPathsThatContainDacAndFft(
+    state: State,
+    graph: Map<String, List<String>>,
+    memo: MutableMap<State, Long>
+): Long {
+    // Base case
+    if (state.node == "out") {
+        return if (state.seenDac && state.seenFft) 1 else 0
+    }
+
+    // Memoized result
+    memo[state]?.let { return it }
+
+    var sum = 0L
+    for (next in graph[state.node].orEmpty()) {
+        val nextState = State(
+            node = next,
+            seenDac = state.seenDac || next == "dac",
+            seenFft = state.seenFft || next == "fft"
+        )
+        sum += countOutPathsThatContainDacAndFft(nextState, graph, memo)
+    }
+
+    memo[state] = sum
+    return sum
 }
 
 fun MutableList<String>.toAdjacencyList(): Map<String, List<String>> {
