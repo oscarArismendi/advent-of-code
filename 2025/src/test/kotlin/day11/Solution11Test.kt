@@ -20,30 +20,32 @@ private const val REAL_PART_1_ANSWER = 796
 
 class Solution11Test {
 
+    // Input files for testing
     private val inputEasyFile = File("src/main/kotlin/day11/inputEasy.txt")
     private val inputEasyPart2File = File("src/main/kotlin/day11/inputEasyPart2.txt")
     private val realInputFile = File("src/main/kotlin/day11/input.txt")
 
+    // Parsed input lines for testing
     private val inputEasyLines = inputEasyFile.readLines().toMutableList()
     private val inputEasyPart2Lines = inputEasyPart2File.readLines().toMutableList()
     private val realInputLines = realInputFile.readLines().toMutableList()
     
     @Test
-    fun `We are able to convert the easy input in an adjacency list`(){
+    fun `We are able to convert the easy input into an adjacency list`() {
         // given
         // when
         val result = inputEasyLines.toAdjacencyList()
         // then
         val expectedResult = mapOf(
-            "aaa" to listOf("you","hhh"),
-            "you" to listOf("bbb","ccc"),
-            "bbb" to listOf("ddd","eee"),
-            "ccc" to listOf("ddd","eee","fff"),
+            "aaa" to listOf("you", "hhh"),
+            "you" to listOf("bbb", "ccc"),
+            "bbb" to listOf("ddd", "eee"),
+            "ccc" to listOf("ddd", "eee", "fff"),
             "ddd" to listOf("ggg"),
             "eee" to listOf("out"),
             "fff" to listOf("out"),
             "ggg" to listOf("out"),
-            "hhh" to listOf("ccc","fff","iii"),
+            "hhh" to listOf("ccc", "fff", "iii"),
             "iii" to listOf("out")
         )
 
@@ -51,7 +53,7 @@ class Solution11Test {
     }
     
     @Test
-    fun `We get the correct answer for the easy input`(){
+    fun `We get the correct answer for the easy input in part 1`() {
         // given
         // when
         val adjacencyList = inputEasyLines.toAdjacencyList()
@@ -61,18 +63,18 @@ class Solution11Test {
     }
     
     @Test
-    fun `We get the correct answer for the easy input in part 2`(){
+    fun `We get the correct answer for the easy input in part 2`() {
         // given
         val start = State("svr", false, false)
         // when
         val adjacencyList = inputEasyPart2Lines.toAdjacencyList()
-        val result = countOutPathsThatContainDacAndFft(start,adjacencyList,mutableMapOf())
+        val result = countOutPathsThatContainDacAndFft(start, adjacencyList, mutableMapOf())
         // then
         assertEquals(EASY_INPUT_PART_2_ANSWER, result)
     }
-
+    
     @Test
-    fun `We get the correct answer for the real input in part 1`(){
+    fun `We get the correct answer for the real input in part 1`() {
         // given
         // when
         val result = firstPart(realInputLines)
@@ -81,11 +83,11 @@ class Solution11Test {
     }
     
     @Test
-    fun `We get the correct answer for the real input in part 2`(){
+    fun `We get the correct answer for the real input in part 2`() {
         // given
         // when
         val result = secondPart(realInputLines)
         // then
         assertEquals(REAL_PART_2_ANSWER, result)
-    }    
+    }
 }
