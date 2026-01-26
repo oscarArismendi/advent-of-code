@@ -33,3 +33,4 @@ Create one placement
 1. It appears that there's an algorithm called DLX(Dancing Links) that could be useful
 2. [Standford lecture: Dancing links by Don Knuth](https://youtu.be/_cR9zDlvP88?si=iu_iwmG2MKsLO6FD)
 3. [See how DLX is implemented in sudoku by Don Knuth](https://www.ocf.berkeley.edu/~jchu/publicportal/sudoku/sudoku.paper.html)
+4. Algorithms are powerful, but remember to trim obvious answers

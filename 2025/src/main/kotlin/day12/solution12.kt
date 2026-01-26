@@ -2,6 +2,9 @@ package com.aoc.day12
 
 import java.io.File
 
+val SQUARE_USED_EASY_INPUT = listOf(7,7,7,7,7,7)
+val SQUARE_USED_REAL_INPUT = listOf(7,6,7,7,5,7)
+
 fun main(){
     val fileName = "src/main/kotlin/day12/input.txt"
     val lines = File(fileName).readLines().toMutableList()
@@ -45,6 +48,25 @@ fun firstPart(lines: MutableList<String>): Int {
         }
         if(line.isNotEmpty()){
             val (width,height,quantities) = line.parseDimensionsAndShapeQuantities()
+            // We're trying to get an early out
+            println(line)
+            var figuresIndex = 0
+            val totalSquaresUsed = quantities.map{
+                it * SQUARE_USED_REAL_INPUT[figuresIndex++]
+            }.toList().sum()
+            if(totalSquaresUsed > width * height){
+                index++
+                continue
+            }
+            val totalFigures = quantities.sum()
+            val spaceNeededIfWeTheFiguresWereAFullSquare = totalFigures * 3
+            if(width >= spaceNeededIfWeTheFiguresWereAFullSquare && height >= spaceNeededIfWeTheFiguresWereAFullSquare){
+                ans++
+                index++
+                continue
+            }
+            // End of the early out
+            
             val allPlacements = mutableListOf<Placement>()
             val shapeInstanceColumns = mutableListOf<String>()
 
@@ -72,7 +94,8 @@ fun firstPart(lines: MutableList<String>): Int {
                     }
                 }
             }
-            println(line)
+            
+            println("It'll enter the dancing link algorithm")
             val dlx = DancingLinks(allPlacements)
             dlx.buildMatrix(width, height, allPlacements, shapeInstanceColumns)
             if(dlx.solve()){ 
@@ -411,7 +434,6 @@ class DancingLinks(
 
         if (depth % 100 == 0 && depth > 0) {
             println("Depth: $depth")
-            if(depth == 200) return false
         }
 
         // Check if all PRIMARY columns are covered
